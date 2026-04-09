@@ -1,0 +1,29 @@
+baseURL = "http://example.org/"
+languageCode = "zh-cn"
+title = "逃跑的笔记"
+theme = "PaperMod"
+
+[params]
+  # 首页自我介绍
+  author = "您的名字"
+  description = "这里是我的个人博客，分享文章和想法。"
+  # 其他配置
+
+[menu]
+  [[menu.main]]
+    identifier = "home"
+    name = "首页"
+    url = "/"
+    weight = 10
+
+  [[menu.main]]
+    identifier = "posts"
+    name = "文章"
+    url = "/posts/"
+    weight = 20
+
+  [[menu.main]]
+    identifier = "tags"
+    name = "标签"
+    url = "/tags/"
+    weight = 30

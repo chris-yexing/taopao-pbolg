@@ -1,0 +1,12 @@
+# Hugo build output
+/public/
+
+# Temporary files
+.hugo_build.lock
+hugo.zip
+
+# Mac OS
+.DS_Store
+
+# VS Code
+.vscode/
