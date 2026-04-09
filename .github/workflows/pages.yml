@@ -18,10 +18,9 @@ jobs:
           hugo-version: '0.160.1'
       - name: Build site
         run: hugo --minify
-      - name: Upload public
-        uses: actions/upload-artifact@v4
+      - name: Upload pages artifact
+        uses: actions/upload-pages-artifact@v1
         with:
-          name: public
           path: public
 
   deploy:
@@ -31,9 +30,4 @@ jobs:
       pages: write
       id-token: write
     steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: public
-          path: public
-      - uses: actions/configure-pages@v4
       - uses: actions/deploy-pages@v1
