@@ -13,7 +13,7 @@ jobs:
         with:
           submodules: 'recursive'
       - name: Setup Hugo
-        uses: peaceiris/actions-hugo@v4
+        uses: peaceiris/actions-hugo@v3
         with:
           hugo-version: '0.160.1'
       - name: Build site
