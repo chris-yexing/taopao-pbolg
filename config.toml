@@ -1,4 +1,4 @@
-baseURL = "http://example.org/"
+baseURL = "https://chris-yexing.github.io/taopao-pbolg/"
 languageCode = "zh-cn"
 title = "逃跑的笔记"
 theme = "PaperMod"
