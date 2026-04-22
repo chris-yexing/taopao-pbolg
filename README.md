@@ -6,7 +6,7 @@
 
 ## 项目简介
 
-本项目是一个静态个人博客，用于分享技术文章和个人想法。采用 **OpenSpec 规范驱动开发** 方法论，结合 **Qoder AI 编程助手** 完成构建。
+本项目是一个静态个人博客，用于分享技术文章和个人想法。采用 **OpenSpec 规范驱动开发** 方法论，结合 **VS Code 编辑器 + AI 大模型** 完成构建。
 
 ## 技术栈
 
@@ -15,7 +15,7 @@
 | [Hugo](https://gohugo.io/) | 静态站点生成器 |
 | [PaperMod](https://github.com/adityatelange/hugo-PaperMod) | Hugo 主题 |
 | [OpenSpec](https://openspec.dev/) | 规范驱动开发方法论 |
-| [Qoder](https://qoder.dev/) | AI 编程助手 |
+| [VS Code](https://code.visualstudio.com/) + AI 大模型 | AI 辅助编程（支持 GPT / Claude / Copilot 等） |
 | GitHub Pages | 免费托管部署 |
 
 ## 功能特性
@@ -109,12 +109,12 @@ tags: ["标签1", "标签2"]
 4. **Tasks** - 拆解可执行的任务
 5. **Implementation** - 编码实现
 
-配合 Qoder AI 助手，实现高效的人机协作开发。
+配合 VS Code 编辑器与 AI 大模型（GPT / Claude / Copilot 等），实现高效的人机协作开发。
 
 ## 相关文章
 
 - [通过 OpenSpec 构建个人博客网站](https://chris-yexing.github.io/taopao-pbolg/posts/my-first-post/)
-- [OpenSpec 与 Qoder：AI 驱动的规范开发实践](https://chris-yexing.github.io/taopao-pbolg/posts/openspec-qoder-intro/)
+- [OpenSpec 与 VS Code + LLM：AI 驱动的规范开发实践](https://chris-yexing.github.io/taopao-pbolg/posts/openspec-qoder-intro/)
 
 ## 许可证
 
