@@ -47,5 +47,4 @@ Articles follow these conventions (match existing posts when adding new ones):
 - Sections use Chinese numeral headings: `## 一、`, `## 二、`, `## 三、`
 - Use tables for comparisons and structured information
 - Use blockquotes (`>`) for key definitions or callouts
-- End with an italicized meta line: `*本文是本站第N篇文章，记录……*`
 - Article length: tutorial ~100 lines, methodology ~140 lines, deep-dive ~220+ lines
