@@ -22,11 +22,17 @@
   var banner = document.getElementById('geo-consent-banner');
   var timer, done = false;
 
+  // 用户主动选择后调用：记录标记 + 关闭
   function dismiss() {
     if (done) return;
     done = true;
     clearTimeout(timer);
     sessionStorage.setItem('geo-consent-asked', '1');
+    hide();
+  }
+
+  // 仅关闭 Banner，不记录标记（超时时使用，下一页继续提示）
+  function hide() {
     banner.classList.add('geo-banner-out');
     setTimeout(function () { banner.style.display = 'none'; }, 420);
   }
@@ -72,6 +78,6 @@
 
   document.getElementById('geo-consent-deny').addEventListener('click', dismiss);
 
-  timer = setTimeout(dismiss, 10000);
+  timer = setTimeout(hide, 10000);
 }());
 </script>
