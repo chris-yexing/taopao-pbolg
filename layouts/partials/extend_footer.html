@@ -1,0 +1,77 @@
+<div id="geo-consent-banner" style="display:none" role="status" aria-live="polite">
+  <span>位置仅用于计算日出日落时间，数据不离开您的浏览器。</span>
+  <button id="geo-consent-allow">允许</button>
+  <button id="geo-consent-deny">不了</button>
+</div>
+
+<script>
+(function () {
+  // ── Manual override: mark session so extend_head.html skips auto-theme ──
+  var toggleBtn = document.getElementById('theme-toggle');
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', function () {
+      sessionStorage.setItem('theme-manual', '1');
+    });
+  }
+
+  // ── Consent banner ───────────────────────────────────────────────────────
+  if (sessionStorage.getItem('geo-consent-asked')) return;
+  if (sessionStorage.getItem('geo-coords'))        return;
+  if (!navigator.geolocation)                      return;
+
+  var banner = document.getElementById('geo-consent-banner');
+  var timer, done = false;
+
+  function dismiss() {
+    if (done) return;
+    done = true;
+    clearTimeout(timer);
+    sessionStorage.setItem('geo-consent-asked', '1');
+    banner.classList.add('geo-banner-out');
+    setTimeout(function () { banner.style.display = 'none'; }, 420);
+  }
+
+  function applyL1(position) {
+    var lat = position.coords.latitude;
+    var lng = position.coords.longitude;
+    sessionStorage.setItem('geo-coords', JSON.stringify({ lat: lat, lng: lng }));
+    // Recalculate theme with L1 accuracy (reuse algorithm from extend_head.html scope)
+    // The algorithm is re-implemented inline here to avoid shared-scope assumptions.
+    var PI = Math.PI, sin = Math.sin, cos = Math.cos, asin = Math.asin, acos = Math.acos, rad = PI / 180;
+    var dayMs = 86400000, J1970 = 2440588, J2000 = 2451545;
+    function toJD(d)   { return d.valueOf() / dayMs - 0.5 + J1970; }
+    function fromJD(j) { return new Date((j + 0.5 - J1970) * dayMs); }
+    var lw = rad * -lng, phi = rad * lat;
+    var d = toJD(new Date()) - J2000;
+    var n = Math.round(d - 0.0009 - lw / (2 * PI));
+    var ds = 0.0009 + lw / (2 * PI) + n;
+    var M  = rad * (357.5291 + 0.98560028 * ds);
+    var L  = M + rad * (1.9148 * sin(M) + 0.02 * sin(2 * M) + 0.0003 * sin(3 * M) + 102.9372) + PI;
+    var sinDec = sin(rad * 23.4397) * sin(L);
+    var dec = asin(sinDec);
+    var Jnoon = J2000 + ds + 0.0053 * sin(M) - 0.0069 * sin(2 * L);
+    var cosH = (sin(rad * -0.833) - sin(phi) * sinDec) / (cos(phi) * cos(dec));
+    if (Math.abs(cosH) <= 1) {
+      var H = acos(cosH);
+      var ds2 = 0.0009 + (H + lw) / (2 * PI) + n;
+      var Jset = J2000 + ds2 + 0.0053 * sin(M) - 0.0069 * sin(2 * L);
+      var sunrise = fromJD(Jnoon - (Jset - Jnoon));
+      var sunset  = fromJD(Jset);
+      var now = Date.now();
+      document.querySelector('html').dataset.theme =
+        (now >= sunrise.getTime() && now < sunset.getTime()) ? 'light' : 'dark';
+    }
+  }
+
+  banner.style.display = 'flex';
+
+  document.getElementById('geo-consent-allow').addEventListener('click', function () {
+    dismiss();
+    navigator.geolocation.getCurrentPosition(applyL1, function () { /* silently stay on L2/L3 */ });
+  });
+
+  document.getElementById('geo-consent-deny').addEventListener('click', dismiss);
+
+  timer = setTimeout(dismiss, 10000);
+}());
+</script>
