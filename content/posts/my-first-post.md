@@ -6,8 +6,6 @@ draft: false
 tags: ["AI", "科技"]
 ---
 
-# 通过openspec构建个人博客网站
-
 本文直接说明使用 OpenSpec 和 Hugo 搭建个人博客的步骤。
 
 ## 1. 创建 OpenSpec change

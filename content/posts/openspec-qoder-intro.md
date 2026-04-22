@@ -6,8 +6,6 @@ draft: false
 tags: ["OpenSpec", "Qoder", "AI", "开发工具", "开发方法论"]
 ---
 
-# OpenSpec 与 Qoder：AI 驱动的规范开发实践
-
 在构建这个博客的过程中，我尝试了一种新的开发方式——使用 **OpenSpec** 结合 **Qoder** 进行规范驱动的开发。这篇文章将介绍这两个工具，以及我在本项目中的实际使用体验。
 
 ## 什么是 OpenSpec？

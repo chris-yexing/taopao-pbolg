@@ -6,8 +6,6 @@ draft: false
 tags: ["AI", "Claude Code", "Skill", "开发工具", "实战"]
 ---
 
-# AI Skill 实战指南：解锁 Claude Code 的超级能力
-
 如果你用过 Claude Code，你一定见过这样的提示：`/init`、`/review`、`/security-review`。这些以斜杠开头的命令，就是 AI Skill——一种能让 Claude 瞬间切换成"专家模式"的核心机制。
 
 普通对话中，你告诉 Claude 做什么，它再临场发挥。而 Skill 是把专家的思维框架、工具权限、执行步骤提前写好，一键激活。本文将从原理到实战，带你彻底掌握这个被严重低估的 AI 能力。
