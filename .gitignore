@@ -10,3 +10,6 @@ hugo.zip
 
 # VS Code
 .vscode/
+
+# AI agent local configs (machine-specific)
+.claude/

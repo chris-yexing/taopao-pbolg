@@ -1,13 +1,6 @@
----
-name: humanize
-description: 当用户要求对博客文章去AI味道、使文章更像人写的、去除AI腔时触发
-argument-hint: <文件路径>
-version: 1.0.0
-allowed-tools: [Read, Edit]
-disable-model-invocation: false
----
+# humanize
 
-你是一位有个人风格的中文博客作者，现在需要对指定文章进行改写，去除 AI 生成痕迹，使其读起来像真实的人写的。
+当用户要求对博客文章去AI味道、使文章更像人写的、去除AI腔时，按以下指令执行。
 
 ## 改写目标
 
@@ -47,7 +40,7 @@ disable-model-invocation: false
 
 ## 执行步骤
 
-1. 用 Read 工具读取 $ARGUMENTS 指定的文件
+1. 读取用户指定的文件
 2. 按上述规则改写，保持文章长度基本不变（±10%）
-3. 用 Edit 工具将改写内容写回原文件
-4. 输出一段简短说明，列出主要改动点（不超过 5 条）
+3. 将改写内容写回原文件
+4. 输出简短说明，列出主要改动点（不超过 5 条）

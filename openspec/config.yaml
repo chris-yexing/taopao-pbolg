@@ -1,20 +1,36 @@
 schema: spec-driven
 
-# Project context (optional)
-# This is shown to AI when creating artifacts.
-# Add your tech stack, conventions, style guides, domain knowledge, etc.
-# Example:
-#   context: |
-#     Tech stack: TypeScript, React, Node.js
-#     We use conventional commits
-#     Domain: e-commerce platform
+workflow:
+  mandatory: true
+  description: |
+    Every feature addition or modification MUST follow this sequence before any code is written:
+      1. proposal  — draft in openspec/changes/<date>-<slug>/proposal.md, get user approval
+      2. design    — detail technical approach in design.md
+      3. specs     — write testable specs per capability in specs/
+      4. tasks     — break work into concrete steps in tasks.md
+    Do NOT write implementation code until specs are approved.
+  directory_convention: openspec/changes/<YYYY-MM-DD>-<slug>/
+  archive: openspec/changes/archive/
 
-# Per-artifact rules (optional)
-# Add custom rules for specific artifacts.
-# Example:
-#   rules:
-#     proposal:
-#       - Keep proposals under 500 words
-#       - Always include a "Non-goals" section
-#     tasks:
-#       - Break tasks into chunks of max 2 hours
+context: |
+  Tech stack: Hugo static site, PaperMod theme, deployed to GitHub Pages.
+  Language: Chinese (Simplified) for all content and proposals.
+  No custom layouts — all rendering via PaperMod theme hooks (extend_head.html, extend_footer.html).
+  Pure client-side only — no backend, no external APIs.
+
+rules:
+  proposal:
+    - Write in Chinese
+    - Must include sections: Why / What Changes / Capabilities / Impact
+    - Keep under 400 words
+    - Get explicit user approval before proceeding to design
+  design:
+    - Write in Chinese
+    - Document all technical decisions and trade-offs
+  specs:
+    - One file per capability under specs/
+    - Each spec must be independently testable
+  tasks:
+    - Write in Chinese
+    - Each task must map to a specific spec
+    - Break into chunks of max 2 hours
