@@ -6,7 +6,7 @@ draft: false
 tags: ["AI", "科技"]
 ---
 
-本文直接说明使用 OpenSpec 和 Hugo 搭建个人博客的步骤。
+记录一下用 OpenSpec 规划、Hugo 搭建博客的实际步骤，没什么废话，直接上。
 
 ## 1. 创建 OpenSpec change
 
@@ -109,6 +109,4 @@ tags: ["AI", "科技"]
 
 要增加标签，直接修改该字段即可。
 
-## 完成
-
-本文作为本网站首篇文章，说明了从 OpenSpec 规划到 Hugo 实现的完整步骤。
+*本文是本站第一篇文章，记录从 OpenSpec 规划到 Hugo 上线的完整步骤。*
