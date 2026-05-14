@@ -3,6 +3,8 @@ title: "ETF可能是投资界最伟大的发明"
 date: 2026-05-12T07:41:00+08:00
 author: "逃跑"
 draft: false
+categories: investment
+number: "003"
 tags: ["理财", "投资", "ETF", "纳斯达克", "随笔"]
 ---
 

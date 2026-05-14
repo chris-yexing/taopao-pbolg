@@ -1,14 +1,14 @@
-baseURL = "https://chris-yexing.github.io/taopao-pbolg/"
+baseURL = "http://localhost:1315/taopao-pbolg/"
 languageCode = "zh-cn"
 title = "逃跑的笔记"
 theme = "PaperMod"
+environment = "dev"
 
 [params]
   author = "逃跑"
   description = "记录投资、成长、效率的个人思考。"
   mainSections = ["posts"]
 
-  # 首页 Hero 区域
   [params.homeInfoParams]
     Title = "逃跑的笔记"
     Content = "记录投资、成长、效率的个人思考。偶尔碎碎念，偶尔认真写。"

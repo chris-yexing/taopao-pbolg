@@ -3,6 +3,8 @@ title: "AI Skill 实战指南：解锁 Claude Code 的超级能力"
 date: 2026-04-22T10:00:00+08:00
 author: "逃跑"
 draft: false
+categories: tool
+number: "001"
 tags: ["AI", "Claude Code", "Skill", "开发工具", "实战"]
 ---
 

@@ -1,8 +1,10 @@
 ---
-title: "通过openspec构建个人博客网站"
+title: "通过 OpenSpec 构建个人博客网站"
 date: 2026-04-09T15:20:00+08:00
 author: "逃跑"
 draft: false
+categories: tool
+number: "004"
 tags: ["AI", "科技"]
 ---
 

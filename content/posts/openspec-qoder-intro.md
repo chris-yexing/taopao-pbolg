@@ -3,6 +3,8 @@ title: "OpenSpec 与 Qoder：AI 驱动的规范开发实践"
 date: 2026-04-10T13:20:44+08:00
 author: "逃跑"
 draft: false
+categories: tool
+number: "003"
 tags: ["OpenSpec", "Qoder", "AI", "开发工具", "开发方法论"]
 ---
 

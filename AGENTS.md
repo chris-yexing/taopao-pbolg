@@ -43,6 +43,22 @@ hugo --minify
 
 PaperMod 主题以 git submodule 管理，克隆时使用 `git clone --recurse-submodules`，或克隆后运行 `git submodule update --init`。
 
+## RTK（Token 节省）
+
+RTK（rtk-lite-cc）是命令输出压缩工具，可在 Claude Code 中手动调用以节省 Token 开销。
+
+**注意：** `rtk init --global --auto-patch` 在 Windows 上不可用（Hook 机制依赖 Unix shell）。目前无法实现命令自动重写，只能手动调用。
+
+手动用法：
+```bash
+rtk git status    # 替代 git status
+rtk pytest        # 替代 pytest
+rtk diff          # 替代 diff
+```
+可用子命令：git, pytest, diff, tree, find, npm, cargo, curl, grep, docker 等。
+
+---
+
 ## 架构
 
 Hugo 静态站点，使用 PaperMod 主题，无自定义 layout 或模板，所有渲染由主题处理。

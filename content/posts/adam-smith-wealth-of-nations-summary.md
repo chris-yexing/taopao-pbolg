@@ -3,6 +3,8 @@ title: "《国富论》核心思想解读：现代经济学的奠基之作"
 date: 2026-04-10T13:24:28+08:00
 author: "逃跑"
 draft: false
+categories: insight
+number: "001"
 tags: ["经济学", "读书笔记", "亚当·斯密", "国富论", "经典著作"]
 ---
 

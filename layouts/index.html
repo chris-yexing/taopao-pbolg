@@ -1,0 +1,305 @@
+{{- define "main" }}
+
+<!-- Hero 区域 -->
+<div class="hero-area">
+  <h1>{{ site.Params.homeInfoParams.Title }}</h1>
+  <p>{{ site.Params.homeInfoParams.Content }}</p>
+</div>
+
+<!-- 文章网格 (按日期倒序，最新 8 篇) -->
+{{- $pages := where site.RegularPages "Type" "in" site.Params.mainSections }}
+{{- $pages := where $pages "Params.hiddenInHomeList" "!=" "true" }}
+{{- $pages = $pages.ByDate.Reverse }}
+{{- $limit := 8 }}
+{{- $homePages := $pages | first $limit }}
+
+<section class="post-grid">
+  {{- range $homePages }}
+  <article class="grid-card">
+    <a href="{{ .Permalink }}" class="card-link">
+      <div class="card-cover">
+        {{- $cat := .Param "categories" }}
+        {{- $cover := .Param "cover" }}
+        {{- if $cover }}
+        <img src="{{ $cover }}" alt="{{ .Title }}" class="cover-img" loading="lazy" />
+        {{- else }}
+        <div class="cover-placeholder" data-category="{{ $cat | default "misc" }}">
+          <div class="cover-summary">{{ .Plain | truncate 120 }}</div>
+        </div>
+        {{- end }}
+        <span class="card-number">{{ $cat | default "misc" }}-{{ .Param "number" | default "001" }}</span>
+      </div>
+      <div class="card-body">
+        <h2 class="card-title">{{ .Title }}</h2>
+        <time class="card-date">{{ .Date.Format "2006-01-02" }}</time>
+      </div>
+    </a>
+  </article>
+  {{- end }}
+</section>
+
+<!-- 引导链接 -->
+{{- if gt (len $pages) $limit }}
+<div class="home-more">
+  <div class="more-links">
+    <a href="/categories/investment/">投资理财</a>
+    <a href="/categories/tool/">效率工具</a>
+    <a href="/categories/insight/">认知碎片</a>
+    <a href="/categories/growth/">成长生活</a>
+    <a href="/categories/misc/">其他</a>
+  </div>
+</div>
+{{- end }}
+
+<style>
+/* ── Hero ── */
+.hero-area {
+  text-align: center;
+  padding: 3.5rem 1rem 2.5rem;
+  max-width: 640px;
+  margin: 0 auto;
+}
+.hero-area h1 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+.hero-area p {
+  color: var(--secondary-text-color);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* ── 网格 ── */
+.post-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 1.5rem 2rem;
+}
+
+/* ── 卡片 ── */
+.grid-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.card-link {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  text-decoration: none;
+  color: inherit;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--entry-bg, #fff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  transition: box-shadow 0.25s ease, transform 0.2s ease, opacity 0.15s;
+}
+.card-link:hover {
+  box-shadow: 0 6px 24px rgba(0,0,0,0.1);
+  transform: translateY(-2px);
+  opacity: 1;
+}
+
+/* ── 封面 ── */
+.card-cover {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--border-color, #e2e8f0);
+}
+
+.cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* 封面图片渐变遮罩 */
+.cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+.card-link:hover .cover-img {
+  transform: scale(1.03);
+}
+
+/* 半透明渐变背景 + 文章摘要 */
+
+/* 用伪元素做文字密度纹理 */
+.cover-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.cover-placeholder::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.12;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 5px,
+      rgba(255,255,255,0.6) 5px,
+      rgba(255,255,255,0.6) 6px
+    );
+}
+.cover-placeholder::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.15) 0%, transparent 70%);
+}
+.cover-placeholder[data-category="investment"] {
+  background: linear-gradient(135deg, rgba(30,58,95,0.92) 0%, rgba(30,64,175,0.78) 100%);
+}
+.cover-placeholder[data-category="tool"] {
+  background: linear-gradient(135deg, rgba(124,58,30,0.92) 0%, rgba(234,88,12,0.78) 100%);
+}
+.cover-placeholder[data-category="insight"] {
+  background: linear-gradient(135deg, rgba(74,31,122,0.92) 0%, rgba(147,51,234,0.78) 100%);
+}
+.cover-placeholder[data-category="growth"] {
+  background: linear-gradient(135deg, rgba(20,83,45,0.92) 0%, rgba(5,150,105,0.78) 100%);
+}
+.cover-placeholder[data-category="misc"] {
+  background: linear-gradient(135deg, rgba(55,65,81,0.92) 0%, rgba(107,114,128,0.78) 100%);
+}
+
+.cover-summary {
+  position: relative;
+  z-index: 1;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.68rem;
+  line-height: 1.7;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 6;
+  -webkit-box-orient: vertical;
+  text-align: justify;
+  letter-spacing: 0.03em;
+  padding: 0.6rem;
+}
+
+/* 卡片悬停效果 */
+.card-link:hover .cover-placeholder {
+  filter: brightness(1.08);
+}
+.card-link:hover .cover-summary {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+/* 封面图片上的摘要遮罩 */
+.cover-img-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.cover-img-wrapper .cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.cover-img-wrapper::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.15) 100%);
+}
+
+/* ── 编号标签（右下角） ── */
+.card-number {
+  position: absolute;
+  bottom: 0.5rem;
+  right: 0.5rem;
+  font-family: monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  padding: 0.1em 0.45em;
+  border-radius: 3px;
+  background: rgba(255,255,255,0.92);
+  color: #374151;
+}
+
+/* ── 卡片内容 ── */
+.card-body {
+  padding: 0.75rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  flex: 1;
+}
+
+.card-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.4;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-date {
+  font-size: 0.75rem;
+  color: var(--secondary-text-color);
+}
+
+/* ── 更多链接 ── */
+.home-more {
+  text-align: center;
+  padding: 0.5rem 1rem 3.5rem;
+}
+.more-links {
+  display: flex;
+  gap: 1.2rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.more-links a {
+  color: var(--secondary-text-color);
+  font-size: 0.875rem;
+  text-decoration: none;
+  padding: 0.3rem 0.7rem;
+  border-radius: 4px;
+  transition: background 0.15s, color 0.15s;
+}
+.more-links a:hover {
+  background: var(--hover-bg, rgba(0,0,0,0.05));
+  color: var(--primary-text-color);
+}
+
+/* ── Mobile: 单列 ── */
+@media (max-width: 767px) {
+  .hero-area { padding: 2.5rem 1rem 1.5rem; }
+  .hero-area h1 { font-size: 1.5rem; }
+  .post-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 0 1rem 1.5rem;
+  }
+}
+
+/* ── Tablet: 两列 ── */
+@media (min-width: 640px) and (max-width: 900px) {
+  .post-grid {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 640px;
+  }
+}
+</style>
+
+{{- end }}

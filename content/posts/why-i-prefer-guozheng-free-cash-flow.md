@@ -3,6 +3,8 @@ title: "为什么我更看好国证自由现金流"
 date: 2026-05-13T10:30:00+08:00
 author: "逃跑"
 draft: false
+categories: investment
+number: "001"
 tags: ["理财", "投资", "ETF", "自由现金流", "学习笔记"]
 ---
 

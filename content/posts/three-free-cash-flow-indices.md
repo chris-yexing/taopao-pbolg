@@ -3,6 +3,8 @@ title: "三个自由现金流指数：编制规则与选股逻辑详解"
 date: 2026-05-13T12:00:00+08:00
 author: "逃跑"
 draft: false
+categories: investment
+number: "002"
 tags: ["投资", "ETF", "现金流", "指数", "技术分析", "价值投资"]
 ---
 

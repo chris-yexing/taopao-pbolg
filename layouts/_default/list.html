@@ -1,0 +1,334 @@
+{{- define "main" }}
+
+{{- /* 各分类的描述 */ -}}
+{{- $categoryDescriptions := dict
+  "investment" (dict
+    "headline" "投资理财"
+    "description" "关于投资的长期思考——从指数基金到资产配置，从经典书籍到市场规律。相信复利的力量，也相信认知的边界决定了收益的上限。"
+    "details" (slice
+      "指数基金与被动投资策略"
+      "经典投资书籍的阅读笔记"
+      "对市场分析方法的思考"
+      "个人投资体系的构建过程"
+    )
+    "closing" "投资不是一夜暴富，而是在不确定性中寻找概率优势。这里记录的是一个普通投资者对市场的理解与反思。"
+    "color" "#3b82f6"
+  )
+  "tool" (dict
+    "headline" "效率工具"
+    "description" "探索能提升效率的工具、工作流与方法论。好的工具不是取代思考，而是让思考更高效。"
+    "details" (slice
+      "博客搭建与静态站点工具"
+      "AI 辅助开发实践"
+      "自动化工作流与脚本"
+      "开发环境与配置管理"
+    )
+    "closing" "工具的价值不在于炫技，而在于每天节省下来的那半小时。记录在这里，也作为自己的使用笔记。"
+    "color" "#f97316"
+  )
+  "insight" (dict
+    "headline" "认知碎片"
+    "description" "一些不一定完整但值得记录的想法与认知更新。可能是读完一本书后的启发，也可能是一次对话带来的视角转变。"
+    "details" (slice
+      "经典书籍阅读笔记"
+      "商业与经济的观察"
+      "认知偏差与思维模型"
+      "跨学科的知识连接"
+    )
+    "closing" "认知升级不是顿悟，而是在不断输入、思考、输出中慢慢发生的。碎片虽小，积累起来也许就有意义。"
+    "color" "#8b5cf6"
+  )
+  "growth" (dict
+    "headline" "成长生活"
+    "description" "记录生活中的成长点滴——习惯养成、健康管理、学习心得。长期主义不只是投资理念，也是一种生活方式。"
+    "details" (slice
+      "习惯养成与自我管理"
+      "健康管理与运动心得"
+      "学习路径与成长复盘"
+      "生活态度与价值观"
+    )
+    "closing" "最好的投资是投资自己。这里的文章关于成为一个更好的自己。"
+    "color" "#10b981"
+  )
+  "misc" (dict
+    "headline" "其他"
+    "description" "不太适合归入其他分类的内容，但觉得值得记录下来。生活本就丰富多彩，不一定每件事都要归类。"
+    "details" (slice
+      "偶尔的碎碎念"
+      "随手记录的灵感"
+      "实验性内容与尝试"
+    )
+    "closing" "这里没有固定主题，更像是一个存放杂念的角落。"
+    "color" "#6b7280"
+  )
+}}
+
+{{- $catKey := "" }}
+{{- $taxonomy := "" }}
+{{- if isset site.Taxonomies "categories" }}
+  {{- $taxonomy = .Data.Singular | default "" }}
+{{- end }}
+{{- if eq $taxonomy "category" }}
+  {{- $catKey = lower .Title }}
+{{- end }}
+
+{{- $catInfo := index $categoryDescriptions $catKey }}
+
+{{- if and (not .IsHome) .Title }}
+<header class="page-header">
+  {{- partial "breadcrumbs.html" . }}
+  <h1>{{ if $catInfo }}{{ $catInfo.headline }}{{ else }}{{ .Title }}{{ end }}</h1>
+  {{- if .Description }}
+  <div class="post-description">{{ .Description | markdownify }}</div>
+  {{- else if $catInfo }}
+  <div class="post-description">{{ $catInfo.description }}</div>
+  {{- end }}
+</header>
+{{- end }}
+
+{{- $pages := union .RegularPages .Sections }}
+{{- $hasPages := gt (len $pages) 0 }}
+
+{{- if $hasPages }}
+  {{- $paginator := .Paginate $pages }}
+
+  <div class="category-list">
+    {{- range $paginator.Pages }}
+    <article class="category-entry">
+      <a href="{{ .Permalink }}" class="cat-entry-link">
+        <div class="entry-top">
+          {{- $pCat := .Param "categories" }}
+          {{- $num := .Param "number" }}
+          {{- if and $pCat $num }}
+          <span class="entry-number" data-category="{{ $pCat }}">{{ $pCat }}-{{ $num }}</span>
+          {{- end }}
+          <h2 class="entry-title">{{ .Title }}</h2>
+        </div>
+        <div class="entry-meta">
+          <time class="entry-date">{{ .Date.Format "2006-01-02" }}</time>
+          {{- $tagTaxonomy := "tags" }}
+          {{- range first 3 ($.GetTerms $tagTaxonomy) }}
+          <span class="entry-tag">{{ .LinkTitle }}</span>
+          {{- end }}
+        </div>
+      </a>
+    </article>
+    {{- end }}
+  </div>
+
+  {{- if gt $paginator.TotalPages 1 }}
+  <footer class="page-footer">
+    <nav class="pagination">
+      {{- if $paginator.HasPrev }}
+      <a class="prev" href="{{ $paginator.Prev.URL | absURL }}">« {{ i18n "prev_page" }}</a>
+      {{- end }}
+      {{- if $paginator.HasNext }}
+      <a class="next" href="{{ $paginator.Next.URL | absURL }}">{{ i18n "next_page" }} »</a>
+      {{- end }}
+    </nav>
+  </footer>
+  {{- end }}
+{{- else if $catInfo }}
+
+  <div class="empty-category">
+    <div class="empty-icon" style="color: {{ $catInfo.color }};">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="16" y1="13" x2="8" y2="13"/>
+        <line x1="16" y1="17" x2="8" y2="17"/>
+        <polyline points="10 9 9 9 8 9"/>
+      </svg>
+    </div>
+    <h2>{{ $catInfo.headline }}</h2>
+    <p class="empty-desc">{{ $catInfo.description }}</p>
+    <ul class="empty-details">
+      {{- range $catInfo.details }}
+      <li>{{ . }}</li>
+      {{- end }}
+    </ul>
+    <p class="empty-closing">{{ $catInfo.closing }}</p>
+    <div class="empty-coming-soon">
+      <span>暂无文章，正在撰写中…</span>
+    </div>
+  </div>
+
+{{- else if not .IsHome }}
+  <div class="empty-category">
+    <h2>{{ .Title }}</h2>
+    <p class="empty-desc">这个分类暂时还没有内容，期待未来在这里分享更多思考。</p>
+  </div>
+{{- end }}
+
+<style>
+.category-list {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.category-entry {
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+}
+.category-entry:first-child {
+  border-top: 1px solid var(--border-color, #e2e8f0);
+}
+
+.cat-entry-link {
+  display: block;
+  padding: 1rem 0;
+  text-decoration: none;
+  color: inherit;
+  transition: opacity 0.15s;
+}
+.cat-entry-link:hover {
+  opacity: 0.7;
+}
+
+.entry-top {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin-bottom: 0.35rem;
+}
+
+.entry-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.entry-number {
+  font-family: monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  padding: 0.1em 0.45em;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.entry-number[data-category="investment"] { background: rgba(59,130,246,0.08); color: #3b82f6; }
+.entry-number[data-category="tool"] { background: rgba(249,115,22,0.08); color: #f97316; }
+.entry-number[data-category="insight"] { background: rgba(139,92,246,0.08); color: #8b5cf6; }
+.entry-number[data-category="growth"] { background: rgba(16,185,129,0.08); color: #10b981; }
+.entry-number[data-category="misc"] { background: rgba(107,114,128,0.08); color: #6b7280; }
+
+.entry-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--secondary-text-color);
+  padding-left: 0.2rem;
+}
+.entry-date { white-space: nowrap; }
+.entry-tag {
+  padding: 0.05em 0.4em;
+  border-radius: 2px;
+  background: var(--border-color, #e2e8f0);
+  font-size: 0.72rem;
+}
+
+/* ── 空分类页 ── */
+.empty-category {
+  max-width: 640px;
+  margin: 2rem auto;
+  padding: 2.5rem 2rem;
+  text-align: center;
+}
+.empty-icon {
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+.empty-category h2 {
+  font-size: 1.3rem;
+  margin-bottom: 0.75rem;
+}
+.empty-desc {
+  color: var(--secondary-text-color);
+  line-height: 1.7;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+}
+.empty-details {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.5rem;
+  text-align: left;
+  display: inline-block;
+}
+.empty-details li {
+  padding: 0.4rem 0;
+  color: var(--secondary-text-color);
+  font-size: 0.9rem;
+}
+.empty-details li::before {
+  content: "✦ ";
+  opacity: 0.4;
+}
+.empty-closing {
+  color: var(--secondary-text-color);
+  font-size: 0.88rem;
+  line-height: 1.7;
+  margin-bottom: 2rem;
+  font-style: italic;
+}
+.empty-coming-soon {
+  display: inline-block;
+  padding: 0.5rem 1.5rem;
+  border-radius: 20px;
+  border: 1px dashed var(--border-color, #e2e8f0);
+  color: var(--secondary-text-color);
+  font-size: 0.85rem;
+}
+
+/* ── Tags 页样式 ── */
+.tag-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  max-width: 640px;
+  margin: 1.5rem auto;
+  padding: 0 1.5rem;
+}
+.tag-pill {
+  display: inline-block;
+  padding: 0.35rem 0.9rem;
+  border-radius: 20px;
+  background: var(--border-color, #e2e8f0);
+  color: var(--secondary-text-color);
+  text-decoration: none;
+  font-size: 0.85rem;
+  transition: background 0.15s, color 0.15s;
+}
+.tag-pill:hover {
+  background: var(--primary-text-color);
+  color: var(--background-color);
+}
+.tag-count {
+  font-size: 0.75rem;
+  opacity: 0.6;
+  margin-left: 0.25rem;
+}
+.tag-cloud-section {
+  max-width: 640px;
+  margin: 1rem auto 2rem;
+  padding: 1.5rem 0;
+}
+</style>
+
+{{- /* 标签云 —— 只在 tags 列表页渲染 */ -}}
+{{- if and (eq .Kind "term") (eq .Data.Singular "tag") }}
+<div class="tag-cloud-section">
+  <div class="tag-cloud">
+    {{- $tags := site.Taxonomies.tags }}
+    {{- range $tags.Alphabetical }}
+    <a href="{{ .Page.Permalink }}" class="tag-pill">
+      {{ .Page.LinkTitle }}<span class="tag-count">{{ .Count }}</span>
+    </a>
+    {{- end }}
+  </div>
+</div>
+{{- end }}
+
+{{- end }}

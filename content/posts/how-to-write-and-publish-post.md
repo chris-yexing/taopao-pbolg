@@ -3,6 +3,8 @@ title: "如何在这个博客手动写文章并发布"
 date: 2026-04-22T12:00:00+08:00
 author: "逃跑"
 draft: false
+categories: tool
+number: "002"
 tags: ["博客", "Hugo", "教程", "写作"]
 ---
 
