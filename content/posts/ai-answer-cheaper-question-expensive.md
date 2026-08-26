@@ -1,6 +1,6 @@
 ---
 title: "AI 把答案变便宜了，问题变贵了"
-date: 2026-08-26T14:30:00+08:00
+date: 2026-08-26T14:48:47+08:00
 author: "逃跑"
 draft: false
 categories: insight
