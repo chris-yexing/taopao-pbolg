@@ -401,7 +401,7 @@ iw dev wlan1 station dump | grep -E 'Station|signal|connected time'
 | WDS 时断时通、吞吐极低（且手动开过 WED） | WED 硬件卸载与 4addr 冲突 | `echo 'options mt7915e wed_enable=N' >> /etc/modules.conf` 后重启 |
 | 整个网突然瘫痪 | 二层环路 | 确认 STP 开了，拔掉多余网线 |
 | 装/升级 wpad 包时报 `Text file busy` | 正在运行的 `/usr/sbin/wpad` 被覆盖 | 先 `/etc/init.d/wpad stop`，再 `apk del` / `apk add` |
-| AX6 高负载卡死、自动重启，或 sysupgrade 刷固件失败 | ipq807x 512 MB 机型内存紧张，ath11k RX buffer 吃内存（#24154） | `grep -E 'MemTotal|MemAvailable' /proc/meminfo`；升级前停 wpad、关掉不必要服务再刷 |
+| AX6 高负载卡死、自动重启，或 sysupgrade 刷固件失败 | ipq807x 512 MB 机型内存紧张，ath11k RX buffer 吃内存（#24154） | `grep MemAvailable /proc/meminfo`；升级前停 wpad、关掉不必要服务再刷 |
 
 MT7986 那个 WED 冲突值得多说一句。补丁是 Shengyu Qu 2025 年 4 月发的 v10 RESEND（`mt76: add wds support when wed is enabled`），它**没有**进 Linux 主线——torvalds master 和 6.12～6.18 的 `mt76.h` 里都搜不到 `MT76_WED_WDS`；进的是 OpenWrt 的 mt76 包，25.12.2 的 `kmod-mt7915e` 用的就是 mt76 仓库 `39c960c3`，已经包含。它是驱动代码，不是无线固件；wcid 256–271（另一 band 768–783）同步 4addr。`wed_enable` 在 `mt7915/mmio.c` 里是 bool 模块参数且默认 false，所以除非你手动开过 WED，这条在新版本上多半不是故障源，当历史坑看即可。
 
