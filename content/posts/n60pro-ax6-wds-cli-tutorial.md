@@ -351,3 +351,50 @@ MT7986 那个 WED 冲突值得多说一句。打进 mt7986 无线固件的 WDS+W
 - [OpenWrt Wifi Roaming — k/v 需要完整版 wpad](https://openwrt.org/docs/guide-user/network/wifi/roaming)
 - [OpenWrt usteer 配置](https://openwrt.org/docs/guide-user/network/wifi/usteer)
 - [openwrt#24154 — ath11k 512 MB 内存耗尽](https://github.com/openwrt/openwrt/issues/24154)
+
+## 十五、修订意见（2026-11-19 复核）
+
+发布后我拿 OpenWrt v25.12.2 的源码树、hostapd `ca266cc2`（25.12.2 实际使用的那个 commit）、官方 wiki 和内核邮件列表把这篇逐条重过了一遍。整体骨架站得住，下面这些是要改的，按「会不会让照着敲的人真的卡住」排序。
+
+### 必须改：会让操作失效或得出错误结论
+
+| 位置 | 现在的写法 | 问题 | 改成 |
+|---|---|---|---|
+| 第 1 步验证 | `strings /usr/sbin/wpad \| grep auth_server_shared_secret` | 这个串由 `#ifndef CONFIG_NO_RADIUS` 决定，测的是 RADIUS 编没编进去，不是 11k/v。basic 恰好 `CONFIG_NO_RADIUS=y`，所以命令碰巧能用，但证明错了对象 | `strings /usr/sbin/wpad \| grep bss_transition`，这个解析在 `#ifdef CONFIG_WNM_AP` 门内，basic 无、full 有，正好对应要补的能力 |
+| 二、物理连接 | 「AX6 搬到目标房间，先网线直连电脑配置」 | 和第 3 步自相矛盾：第 3 步把 lan 设成 `192.168.1.2 / 网关 192.168.1.1`，之后网线直连电脑时电脑不在这个网段，根本进不去 LuCI | AX6 的 LAN 口先用网线接**主路由 LAN 口**，全程从主路由侧访问 `192.168.1.2`；确认无线桥通了再断电搬位置 |
+| 第 8 步验收 | 在 AX6 上 `ping 192.168.1.1` 走一圈看丢包 | ping 从 AX6 发出，测的是回程链路；走动的是手机，手机漫游与否不体现在这个 ping 里 | 从手机侧发起 ping/mtr 并走动，同时用 `ubus call usteer get_clients` 看手机 MAC 落在哪台 |
+| 第 3 步 STP | `uci set network.@device[0].stp='1'`，且说「两台都开」 | 用索引定位 bridge 段太脆，不保证 `br-lan` 排在 `@device[0]`；命令还只写在 AX6 小节里，主路由侧等于没说 | 先 `uci show network \| grep type=bridge` 确认段名再改；补一句主路由上同样执行 |
+
+### 表述要修：结论方向没错，论据或归因不准
+
+| 位置 | 问题 | 事实 |
+|---|---|---|
+| 十二、WDS+WED | 「打进 mt7986 无线固件」「2025 年才进主线」 | 两处都不准。这个补丁（Shengyu Qu，v10 RESEND，2025-04）没进 Linux 主线——torvalds master 和 6.12～6.18 的 `mt76.h` 里搜不到 `MT76_WED_WDS`；它进的是 OpenWrt 的 mt76 包，25.12.2 的 `kmod-mt7915e` 源就是 mt76 仓库 `39c960c3`，已含。而且是驱动代码改动，不是固件。`wcid 256–271` 有出处（另一 band 是 768–783） |
+| 十二、WED 排障条目 | 建议关硬件卸载 | `wed_enable` 在 `mt7915/mmio.c` 里是 bool 模块参数且**默认 false**，25.12.2 又已带上 WDS+WED 支持，这条来自 2024 年的 issue #14680，新版本多半不再是故障源，该降级成历史坑。另外参数名和 `=N` 写法是对的，但 `/etc/modules.conf` 不在 sysupgrade 保留列表，要写 `/etc/modules.d/00-mt7915e.conf` |
+| 第 6 步加密选择 | 「WPA3 强制 PMF，和本地生成 PMK 冲突，会破坏漫游」 | `ft_psk_generate_local` 只在 FT-PSK 密钥套件下生效（代码两处都以 `wpa_key_mgmt_ft_psk()` 为条件），SAE 下被静默忽略，跟 PMF 不冲突；802.11r 本身就要 802.11w，而 hostapd 明确支持 `FT-SAE`（wiki 那张抓包截图就是 "FT using SAE"）。选 psk2 的正确理由是：这个参数只对 FT-PSK 有效，且要照顾不认 SAE/11r 的老客户端 |
+| 第 9 步「开 k/v 接口被禁用」 | k 和 v 一起背锅 | 源码上 `rrm.c` 是无条件编译的，`rrm_neighbor_report/beacon_report` 解析没有宏门，basic 在编译层面其实支持 802.11k。真正让 hostapd 报 "unknown configuration item" 退出、netifd 置 disabled 的是 `bss_transition` 那一行。顺带一提，这里我的说法比 wiki 那句「wpad-basic 不支持 802.11k」更贴近源码 |
+| 第 7 步 usteer | 「邻居列表空着就补装 static-neighbor-reports」 | 逻辑不通。按 wiki 它是 usteer/dawn 的**替代品**（只做静态 11k 邻居报告），不是 usteer 的补丁，装了不会让 usteer 发现对端。邻居一直空的真实原因通常是另一台 wpad 不是完整版、`network` 配错、防火墙拦了。该改成：跨 vendor 实在发现不了就干脆放弃 usteer，用 static-neighbor-reports 手工填 |
+| 第 12 步排障表 | 「AX6 升级固件失败 → wpad 没停」 | 真实场景是升级 **wpad 包**时报 "Text file busy"（运行中的可执行文件覆盖不掉），跟 sysupgrade 固件无关，措辞要指明 |
+| 七、ath11k 4addr | 「内核早在 2021 年就有」 | commit `34c67dc3` 确实是 2021-07-21 提交、Tested-on IPQ8074，但首次随内核发布是 v5.16。年份对，"就有"要加限定 |
+
+### 该补上的两处遗漏
+
+`static-neighbor-reports` 之外，第 7 步的 usteer 是只装不配，而第 8 步却指望引导切换生效——wiki 写明 AP steering 需要 `signal_diff_threshold` 大于 0，默认值是 0，官方推荐的那两个值恰好都不在默认里。照这篇敲完，usteer 其实不会动作：
+
+```bash
+uci set usteer.general.roam_scan_snr='-65'
+uci set usteer.general.signal_diff_threshold='8'
+/etc/init.d/usteer reload
+```
+
+另一处是参考来源里列了 openwrt#24154 却全篇没用。它讲的是 ipq807x 低内存机型 ath11k RX buffer pool 在持续负载下把可用内存吃光导致挂死（机子是 Linksys MX4200，512 MB 标称、约 372 MB 可用，issue 至今 OPEN）。Redmi AX6 同为 ipq807x + 512 MB，这个风险对本文设备是直接相关的，排障表里该有一行：「AX6 高负载卡死或自动重启 → `free` 看 MemAvailable → 参考 #24154」。
+
+> 还有两点不算错但读者需要知道：psk2 加 4addr 二层透传，意味着任何知道密码的设备都能进入你的内网桥，而不只是"连上一个 Wi-Fi"；300–450 Mbps 那个数字更像手机侧 2×2 客户端的真实值，4×4 HE80 回程半双工理论上能到 500–700，写成"手机侧预期"比写成回程上限准确。
+
+### 复核为正确、可以照抄的部分
+
+25.12.2 这个版本真实存在且已切到 apk；`netcore,n60-pro`（mediatek/filogic）和 `redmi,ax6`（qualcommax/ipq807x）都在官方支持列表，两个 target 的 arch 都是 `aarch64_cortex-a53`；`kmod-mt7915e`、`kmod-mt7986-firmware`、`kmod-ath11k-ahb`、`ath11k-firmware-ipq8074`、`ipq-wifi-redmi_ax6`、`wpad-openssl`、`usteer`、`luci-app-usteer`、`iw`、`static-neighbor-reports` 包名全部有效，默认 wpad 确实是 `wpad-basic-mbedtls`，"先删后装"的前提成立。选项名我一个没踩空：`mode='sta'` 合法（25.12.2 的 ucode 脚本只认 ap/sta/adhoc/mesh/monitor），`wds`、`isolate`、`ieee80211k`、`bss_transition`、`rrm_neighbor_report`、`rrm_beacon_report`、`mobility_domain`、`ft_over_ds`、`ft_psk_generate_local` 都在 `wireless.wifi-iface` 的 schema 里；`ieee80211v`、`navm` 这类老写法在 25.12 已不存在，这篇没用。`htmode` 写在 `wireless.radio1.htmode`（device 段）是对的，别照抄到 wifi-iface 上。QCN5054「80 MHz 4×4、160 MHz 2×2」、信道 149 不碰 DFS 且 CN 合法、basic 带 11r/11w/SAE 而缺 11v，这几点都和拆机报告、包描述、`hostapd-basic.config` 对得上。文末七个链接我逐个请求过，没有死链。
+
+### 仍然没有答案的
+
+ath11k 与 mt76 之间做 WDS 回程，我同样没找到任何公开实测——这正是第 4 步当门禁设计的价值，改不掉也别绕过。BusyBox 的 `ip link show master br-lan` 是否支持 `master` 过滤我也没在设备上验过，稳妥起见加一条 `iwinfo wlanX assoclist` 作为旁证。
